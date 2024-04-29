@@ -25,7 +25,7 @@ router.post("/login", async (req, res, next) => {
   try {
     const userData = await User.findOne({ email });
     if (userData && bcryptjs.compareSync(password, userData.passwordHash)) {
-      const token = jwt.sign({ id: userData._id }, process.env.SECRET_KEY, { algorithm: "HS256", expiresIn: "1h" });
+      const token = jwt.sign({ id: userData._id, isExpert }, process.env.SECRET_KEY, { algorithm: "HS256", expiresIn: "1h" });
       res.status(200).json({ message: "success", data: { token } });
     } else {
       res.status(401).json({ message: "Email or password is incorrect." });
