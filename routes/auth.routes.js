@@ -87,7 +87,7 @@ router.post("/forgot-password", async (req, res, next) => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + info.response);
 
-    res.status(200).json();
+    res.status(200);
   } catch (err) {
     next(err);
   }
