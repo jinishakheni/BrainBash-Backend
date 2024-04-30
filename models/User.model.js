@@ -70,7 +70,16 @@ const userSchema = new Schema(
           type: String,
           enum: ['Beginner', 'Intermediate', 'Advanced'],
         },
-        rating: Number
+        ratingScore: {
+          type: Number,
+          min: 0,
+          max: 5,
+          default: 0
+        },
+        ratingCount: {
+          type: Number,
+          default: 0
+        }
       }],
       required: function () {
         return this.isExpert; // Make it required if isExpert is true
