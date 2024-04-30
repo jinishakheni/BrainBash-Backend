@@ -11,16 +11,26 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
+    email: {
+      type: String,
+      trim: true,
+      unique: true,   // Email should be unique
+      required: [true, 'Email is required.'],
+    },
+    passwordHash: {
+      type: String,
+      required: [true, 'Password is required.'],
+    },
     dateOfBirth: {
       type: Date,
       validate: {
         validator: function (value) {
-          // Check if the date of birth is at least 18 years ago
-          const minDate = new Date();
-          minDate.setFullYear(minDate.getFullYear() - 18);
-          return value <= minDate;
+          // Check if the date of birth is in the past
+          const currentDate = new Date();
+          currentDate.setHours(0, 0, 0, 0);
+          return value < currentDate;
         },
-        message: "You should atleast 18 years old."
+        message: "Birth date should be in the past."
       }
     },
     phoneNumber: {
@@ -34,31 +44,14 @@ const userSchema = new Schema(
         message: `Phone number should contain at least 10 digits.`
       }
     },
-    email: {
-      type: String,
-      trim: true,
-      unique: true,   // Email should be unique
-      required: [true, 'Email is required.'],
-    },
-    passwordHash: {
-      type: String,
-      required: [true, 'Password is required.'],
-    },
     gender: {
       type: String,
       enum: ["Female", "Male"]
     },
     photo: String,
-    isExpert: {
-      type: Boolean,
-      required: true
-    },
     bio: {
       type: String,
-      trim: true,
-      required: function () {
-        return this.isExpert; // Make it required if isExpert is true
-      },
+      trim: true
     },
     skills: {
       type: [{
@@ -80,10 +73,7 @@ const userSchema = new Schema(
           type: Number,
           default: 0
         }
-      }],
-      required: function () {
-        return this.isExpert; // Make it required if isExpert is true
-      }
+      }]
     },
     events: {
       type: [Types.ObjectId],
