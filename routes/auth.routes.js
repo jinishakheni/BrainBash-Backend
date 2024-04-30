@@ -23,7 +23,12 @@ router.post("/signup", async (req, res, next) => {
     } else {
       const salt = bcrypt.genSaltSync(saltCount);
       const passwordHash = bcryptjs.hashSync(password, salt);
-      const newUser = await User.create({ firstName, lastName, email, passwordHash });
+      const newUser = await User.create({
+        firstName,
+        lastName,
+        email,
+        passwordHash,
+      });
       const newUserWithoutPassword = { ...newUser.toObject() };
       delete newUserWithoutPassword.passwordHash;
       res.status(201).json(newUserWithoutPassword);
@@ -40,7 +45,10 @@ router.post("/login", async (req, res, next) => {
   try {
     const userData = await User.findOne({ email });
     if (userData && bcryptjs.compareSync(password, userData.passwordHash)) {
-      const token = jwt.sign({ userId: userData._id }, process.env.SECRET_KEY, { algorithm: "HS256", expiresIn: "1h" });
+      const token = jwt.sign({ userId: userData._id }, process.env.SECRET_KEY, {
+        algorithm: "HS256",
+        expiresIn: "1h",
+      });
       res.status(200).json({ token });
     } else {
       res.status(401).json({ message: "Email or password is incorrect." });
@@ -87,7 +95,7 @@ router.post("/forgot-password", async (req, res, next) => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + info.response);
 
-    res.status(200);
+    res.sendStatus(200);
   } catch (err) {
     next(err);
   }
