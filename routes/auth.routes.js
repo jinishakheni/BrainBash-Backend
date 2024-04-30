@@ -22,7 +22,7 @@ router.post("/signup", async (req, res, next) => {
       res.status(403).json({ message: "User aleady exist with this email." });
     } else {
       const salt = bcrypt.genSaltSync(saltCount);
-      const passwordHash = bcryptjs.hashSync(password, salt);
+      const passwordHash = bcrypt.hashSync(password, salt);
       const newUser = await User.create({
         firstName,
         lastName,
@@ -34,7 +34,6 @@ router.post("/signup", async (req, res, next) => {
       res.status(201).json(newUserWithoutPassword);
     }
   } catch (error) {
-    console.error("Error while signing up user: ", userData);
     next(error);
   }
 });
@@ -44,7 +43,7 @@ router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const userData = await User.findOne({ email });
-    if (userData && bcryptjs.compareSync(password, userData.passwordHash)) {
+    if (userData && bcrypt.compareSync(password, userData.passwordHash)) {
       const token = jwt.sign({ userId: userData._id }, process.env.SECRET_KEY, {
         algorithm: "HS256",
         expiresIn: "1h",
@@ -61,10 +60,8 @@ router.post("/login", async (req, res, next) => {
 //Forgot Password Route
 router.post("/forgot-password", async (req, res, next) => {
   const { email } = req.body;
-
   try {
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
