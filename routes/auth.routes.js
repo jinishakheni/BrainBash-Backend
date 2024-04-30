@@ -12,7 +12,7 @@ router.post("/signup", async (req, res, next) => {
     userData.passwordHash = bcryptjs.hashSync(password, salt);
     const newUser = await User.create(userData);
     const { passwordHash, ...user } = newUser._doc;
-    res.status(201).json({ message: "success", data: user });
+    res.status(201).json(user);
   } catch (error) {
     console.error("Error while signing up user: ", userData);
     next(error);
@@ -25,8 +25,8 @@ router.post("/login", async (req, res, next) => {
   try {
     const userData = await User.findOne({ email });
     if (userData && bcryptjs.compareSync(password, userData.passwordHash)) {
-      const token = jwt.sign({ id: userData._id, isExpert }, process.env.SECRET_KEY, { algorithm: "HS256", expiresIn: "1h" });
-      res.status(200).json({ message: "success", data: { token } });
+      const token = jwt.sign({ id: userData._id }, process.env.SECRET_KEY, { algorithm: "HS256", expiresIn: "1h" });
+      res.status(200).json({ token });
     } else {
       res.status(401).json({ message: "Email or password is incorrect." });
     }
@@ -38,7 +38,7 @@ router.post("/login", async (req, res, next) => {
 
 // Verify token route
 router.get("/verify", isAuthenticated, (req, res) => {
-  res.status(200).json({ message: "success", data: req.payload });
+  res.status(200).json(req.payload);
 })
 
 module.exports = router;
