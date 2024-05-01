@@ -25,6 +25,11 @@ const eventSchema = new Schema(
       type: String,
       required: [true, 'Meeting link is required.'],
     },
+    photoUrl: {
+      type: String,
+      trim: true,
+      default: "https://cdn-icons-png.flaticon.com/512/2558/2558944.png",
+    },
     hostId: {
       type: Types.ObjectId,
       ref: "User",
