@@ -29,9 +29,7 @@ router.post("/signup", async (req, res, next) => {
         email,
         passwordHash,
       });
-      const newUserWithoutPassword = { ...newUser.toObject() };
-      delete newUserWithoutPassword.passwordHash;
-      res.status(201).json(newUserWithoutPassword);
+      res.status(201).json(newUser);
     }
   } catch (error) {
     next(error);
