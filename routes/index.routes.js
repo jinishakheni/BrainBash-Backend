@@ -13,4 +13,12 @@ router.use("/events", eventRoutes);
 const userRoutes = require("./user.routes");
 router.use("/users", userRoutes);
 
+//Category routes
+const categoryRoutes = require("./category.routes");
+router.use("/categories", categoryRoutes);
+
+//Skill routes
+const skillRoutes = require("./skill.routes");
+router.use("/skills", skillRoutes);
+
 module.exports = router;
