@@ -1,39 +1,48 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types } = require("mongoose");
 
 const eventSchema = new Schema(
   {
     title: {
       type: String,
       trim: true,
-      required: [true, 'Title is required.'],
+      required: [true, "Title is required."],
     },
     description: {
       type: String,
       trim: true,
-      required: [true, 'Description is required.'],
+      required: [true, "Description is required."],
     },
     startingTime: {
       type: Date,
-      required: [true, 'Starting time is required.'],
+      required: [true, "Starting time is required."],
     },
     duration: {
       type: String,
       trim: true,
-      required: [true, 'Duration is required.'],
+      required: [true, "Duration is required."],
     },
-    skills: {
-      type: [Types.ObjectId],
-      ref: "Skill",
-      required: true
-    },
+    skills: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Skill",
+        required: true,
+      },
+    ],
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+      },
+    ],
     mode: {
       type: String,
       enum: ["Online", "Offline"],
-      required: true
+      required: true,
     },
     address: {
       type: String,
-      required: [true, 'Meeting link is required.'],
+      required: [true, "Meeting link is required."],
     },
     imageUrl: {
       type: String,
@@ -43,19 +52,26 @@ const eventSchema = new Schema(
     hostId: {
       type: Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
-    attendees: {
-      type: [Types.ObjectId],
-      ref: "User"
-    }
+    attendees: [
+      { type: Types.ObjectId, ref: "User", required: true }
+    ],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret.createdAt;
+        delete ret.updatedAt;
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
-)
+);
 
-const Event = model('Event', eventSchema);
+const Event = model("Event", eventSchema);
 
 module.exports = Event;

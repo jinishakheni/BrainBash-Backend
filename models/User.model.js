@@ -53,42 +53,41 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
-    skills: {
-      type: [
-        {
-          name: {
-            type: String,
-            trim: true,
-          },
-          proficiency: {
-            type: String,
-            enum: ["Beginner", "Intermediate", "Advanced"],
-          },
-          ratingScore: {
-            type: Number,
-            min: 0,
-            max: 5,
-            default: 0,
-          },
-          ratingCount: {
-            type: Number,
-            default: 0,
-          },
+    skills: [
+      {
+        skillId: {
+          type: Types.ObjectId,
+          ref: "Skill",
+          required: true,
         },
-      ],
-    },
-    events: {
-      type: [Types.ObjectId],
-      ref: "Event",
-    },
-    education: {
-      type: String,
-      trim: true,
-    },
-    certification: {
-      type: String,
-      trim: true,
-    },
+        proficiency: {
+          type: String,
+          enum: ["Beginner", "Intermediate", "Advanced"],
+          required: true,
+        },
+        ratingScore: {
+          type: Number,
+          min: 0,
+          max: 5,
+          default: 0,
+        },
+        ratingCount: {
+          type: Number,
+          default: 0,
+        },
+        _id: false,
+      },
+    ],
+    categories: [{ type: Types.ObjectId, ref: "Category", required: true }],
+
+    events: [{ type: Types.ObjectId, ref: "Event", required: true }],
+
+    education: [
+      {
+        degreeName: { type: String, trim: true, required: true },
+        date: { type: Date, trim: true, required: true },
+      },
+    ],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
@@ -98,7 +97,7 @@ const userSchema = new Schema(
         delete ret.createdAt;
         delete ret.updatedAt;
         delete ret.__v;
-        delete ret.passwordHash
+        delete ret.passwordHash;
         return ret;
       },
     },
