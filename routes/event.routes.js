@@ -10,9 +10,12 @@ const Event = require("../models/Event.model");
 // Fetch events route
 // TODO Implement filter logic
 router.get("/", async (req, res, next) => {
-
+  const hostProjection = { _id: 0, firstName: 1, lastName: 1 };
+  if (req.query.title) {
+    req.query.title = { $regex: req.query.title, $options: 'i' }
+  }
   try {
-    const events = await Event.find();
+    const events = await Event.find(req.query).populate({ path: "hostId", select: hostProjection });
     res.status(200).json(events);
   } catch (error) {
     next(error);
@@ -25,7 +28,7 @@ router.get("/:eventId", async (req, res, next) => {
   const { eventId } = req.params;
 
   try {
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(eventId).populate("hostId");
     event ? res.status(200).json(event) : res.status(404).json({ message: "The requested event was not found" });
   } catch (error) {
     next(error);

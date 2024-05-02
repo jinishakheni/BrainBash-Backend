@@ -21,11 +21,21 @@ const eventSchema = new Schema(
       trim: true,
       required: [true, 'Duration is required.'],
     },
-    meetingUrl: {
+    skills: {
+      type: [Types.ObjectId],
+      ref: "Skill",
+      required: true
+    },
+    mode: {
+      type: String,
+      enum: ["Online", "Offline"],
+      required: true
+    },
+    address: {
       type: String,
       required: [true, 'Meeting link is required.'],
     },
-    photoUrl: {
+    imageUrl: {
       type: String,
       trim: true,
       default: "https://cdn-icons-png.flaticon.com/512/2558/2558944.png",
