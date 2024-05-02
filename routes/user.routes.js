@@ -66,6 +66,13 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
 router.delete("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   try {
+
+    if (id.toString() !== req.payload.userId.toString()) {
+      return res.status(400).json({
+        message: "You're not authorized to change another user's data",
+      });
+    }
+    
     const user = await User.findByIdAndDelete(id);
     if (user) {
       res.sendStatus(204);
