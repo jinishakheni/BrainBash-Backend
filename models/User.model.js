@@ -1,11 +1,11 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types } = require("mongoose");
 
 const userSchema = new Schema(
   {
     firstName: {
       type: String,
       trim: true,
-      required: [true, 'First name is required.'],
+      required: [true, "First name is required."],
     },
     lastName: {
       type: String,
@@ -14,12 +14,12 @@ const userSchema = new Schema(
     email: {
       type: String,
       trim: true,
-      unique: true,   // Email should be unique
-      required: [true, 'Email is required.'],
+      unique: true, // Email should be unique
+      required: [true, "Email is required."],
     },
     passwordHash: {
       type: String,
-      required: [true, 'Password is required.'],
+      required: [true, "Password is required."],
     },
     dateOfBirth: {
       type: Date,
@@ -30,8 +30,8 @@ const userSchema = new Schema(
           currentDate.setHours(0, 0, 0, 0);
           return value < currentDate;
         },
-        message: "Birth date should be in the past."
-      }
+        message: "Birth date should be in the past.",
+      },
     },
     phoneNumber: {
       type: String,
@@ -41,43 +41,45 @@ const userSchema = new Schema(
           // Check if the phone number contains at least 10 digits
           return /^[\d\s+]{10,}$/.test(value);
         },
-        message: `Phone number should contain at least 10 digits.`
-      }
+        message: `Phone number should contain at least 10 digits.`,
+      },
     },
     gender: {
       type: String,
-      enum: ["Female", "Male"]
+      enum: ["Female", "Male"],
     },
     photo: String,
     bio: {
       type: String,
-      trim: true
+      trim: true,
     },
     skills: {
-      type: [{
-        name: {
-          type: String,
-          trim: true,
+      type: [
+        {
+          name: {
+            type: String,
+            trim: true,
+          },
+          proficiency: {
+            type: String,
+            enum: ["Beginner", "Intermediate", "Advanced"],
+          },
+          ratingScore: {
+            type: Number,
+            min: 0,
+            max: 5,
+            default: 0,
+          },
+          ratingCount: {
+            type: Number,
+            default: 0,
+          },
         },
-        proficiency: {
-          type: String,
-          enum: ['Beginner', 'Intermediate', 'Advanced'],
-        },
-        ratingScore: {
-          type: Number,
-          min: 0,
-          max: 5,
-          default: 0
-        },
-        ratingCount: {
-          type: Number,
-          default: 0
-        }
-      }]
+      ],
     },
     events: {
       type: [Types.ObjectId],
-      ref: "Event"
+      ref: "Event",
     },
     education: {
       type: String,
@@ -86,14 +88,23 @@ const userSchema = new Schema(
     certification: {
       type: String,
       trim: true,
-    }
+    },
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret.createdAt;
+        delete ret.updatedAt;
+        delete ret.__v;
+        delete ret.passwordHash
+        return ret;
+      },
+    },
   }
-)
+);
 
-const User = model('User', userSchema);
+const User = model("User", userSchema);
 
 module.exports = User;
