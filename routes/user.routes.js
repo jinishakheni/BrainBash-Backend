@@ -4,7 +4,7 @@ const router = require("express").Router();
 //MidlleWare Imports
 const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
 
-//Model
+//Models
 const User = require("../models/User.model");
 
 //Routes
@@ -22,7 +22,7 @@ router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("skills.skillId");
     if (user) {
       return res.status(200).json(user);
     }
@@ -35,12 +35,20 @@ router.get("/:id", async (req, res, next) => {
 router.put("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   const { passwordHash, ...restOfFields } = req.body;
+
   try {
     if (passwordHash) {
       return res
         .status(400)
         .json({ message: "Cannot update password directly." });
     }
+
+    if (id.toString() !== req.payload.userId.toString()) {
+      return res.status(400).json({
+        message: "You're not authorized to change another user's data",
+      });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(id, restOfFields, {
       new: true,
       runValidators: true,
