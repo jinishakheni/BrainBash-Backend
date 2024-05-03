@@ -1,9 +1,6 @@
 //Module imports
 const router = require("express").Router();
 
-//MidlleWare Imports
-const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
-
 //Model
 const Category = require("../models/Category.model");
 
