@@ -78,7 +78,7 @@ const userSchema = new Schema(
         _id: false,
       },
     ],
-    categories: [{ type: Types.ObjectId, ref: "Category", required: true }],
+    categories: [String],
 
     events: [{ type: Types.ObjectId, ref: "Event", required: true }],
 
