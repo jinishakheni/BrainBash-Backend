@@ -21,13 +21,7 @@ const eventSchema = new Schema(
       trim: true,
       required: [true, "Duration is required."],
     },
-    skills: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Skill",
-        required: true,
-      },
-    ],
+    skills: [String],
     categories: [String],
     mode: {
       type: String,
@@ -48,7 +42,7 @@ const eventSchema = new Schema(
       ref: "User",
       required: true,
     },
-    attendees: [{ type: Types.ObjectId, ref: "User", required: true }],
+    attendees: [{ type: Types.ObjectId, ref: "User"}],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
