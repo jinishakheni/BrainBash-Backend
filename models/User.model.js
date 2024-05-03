@@ -11,6 +11,10 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
+    fullName: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       trim: true,
@@ -55,9 +59,8 @@ const userSchema = new Schema(
     },
     skills: [
       {
-        skillId: {
-          type: Types.ObjectId,
-          ref: "Skill",
+        skillName: {
+          type: String,
           required: true,
         },
         proficiency: {
@@ -103,6 +106,47 @@ const userSchema = new Schema(
     },
   }
 );
+
+userSchema.pre("save", function (next) {
+  if (this.isModified("firstName") || this.isModified("lastName")) {
+    // If firstName or lastName is modified, update fullName
+    this.fullName = `${this.firstName || ""} ${this.lastName || ""}`.trim();
+  }
+  next();
+});
+
+// Post-update hook to update fullName based on firstName and lastName after update
+userSchema.post("findOneAndUpdate", async function (result) {
+  try {
+    console.log("Post-update hook triggered");
+
+    const { _id } = result;
+
+    // Fetch the updated document to get current firstName and lastName
+    const updatedDocument = await this.model.findById(_id);
+
+    if (updatedDocument) {
+      const { firstName, lastName, fullName } = updatedDocument;
+
+      // Check if fullName is already correctly set
+      const updatedFullName = `${firstName} ${lastName}`.trim();
+      if (fullName !== updatedFullName) {
+        // Update the fullName field in the document
+        await this.model.findOneAndUpdate(
+          { _id: _id },
+          { $set: { fullName: updatedFullName } }
+        );
+        console.log("fullName updated successfully");
+      } else {
+        console.log("fullName is already correctly set");
+      }
+    } else {
+      console.log("Error: Updated document not found");
+    }
+  } catch (error) {
+    console.error("Error in post-update hook:", error);
+  }
+});
 
 const User = model("User", userSchema);
 
