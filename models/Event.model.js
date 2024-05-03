@@ -28,13 +28,7 @@ const eventSchema = new Schema(
         required: true,
       },
     ],
-    categories: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-        required: true,
-      },
-    ],
+    categories: [String],
     mode: {
       type: String,
       enum: ["Online", "Offline"],
@@ -54,9 +48,7 @@ const eventSchema = new Schema(
       ref: "User",
       required: true,
     },
-    attendees: [
-      { type: Types.ObjectId, ref: "User", required: true }
-    ],
+    attendees: [{ type: Types.ObjectId, ref: "User", required: true }],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
