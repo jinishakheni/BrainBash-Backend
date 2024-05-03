@@ -11,7 +11,11 @@ const User = require("../models/User.model");
 router.get("/", async (req, res, next) => {
   req.query["skills.0"] = { $exists: true };
   try {
-    const users = await User.find(req.query);
+    const users = await User.find(req.query).select({
+      fullName: 1,
+      categories: 1,
+      _id: 1,
+    });
     res.status(200).json(users);
   } catch (error) {
     next(error);
@@ -22,7 +26,7 @@ router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findById(id).populate("skills.skillId");
+    const user = await User.findById(id);
     if (user) {
       return res.status(200).json(user);
     }
@@ -66,13 +70,12 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
 router.delete("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   try {
-
     if (id.toString() !== req.payload.userId.toString()) {
       return res.status(400).json({
         message: "You're not authorized to change another user's data",
       });
     }
-    
+
     const user = await User.findByIdAndDelete(id);
     if (user) {
       res.sendStatus(204);
