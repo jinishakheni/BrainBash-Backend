@@ -4,14 +4,18 @@ const router = require("express").Router();
 //MidlleWare Imports
 const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
 
-//Model
+//Models
 const User = require("../models/User.model");
 
 //Routes
 router.get("/", async (req, res, next) => {
   req.query["skills.0"] = { $exists: true };
   try {
-    const users = await User.find(req.query);
+    const users = await User.find(req.query).select({
+      fullName: 1,
+      categories: 1,
+      _id: 1,
+    });
     res.status(200).json(users);
   } catch (error) {
     next(error);
@@ -35,12 +39,20 @@ router.get("/:id", async (req, res, next) => {
 router.put("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   const { passwordHash, ...restOfFields } = req.body;
+
   try {
     if (passwordHash) {
       return res
         .status(400)
         .json({ message: "Cannot update password directly." });
     }
+
+    if (id.toString() !== req.payload.userId.toString()) {
+      return res.status(400).json({
+        message: "You're not authorized to change another user's data",
+      });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(id, restOfFields, {
       new: true,
       runValidators: true,
@@ -58,6 +70,12 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
 router.delete("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   try {
+    if (id.toString() !== req.payload.userId.toString()) {
+      return res.status(400).json({
+        message: "You're not authorized to change another user's data",
+      });
+    }
+
     const user = await User.findByIdAndDelete(id);
     if (user) {
       res.sendStatus(204);
