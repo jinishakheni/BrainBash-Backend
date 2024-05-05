@@ -8,11 +8,13 @@ const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
 const Event = require("../models/Event.model");
 
 // Fetch events route
-// TODO Implement filter logic
 router.get("/", async (req, res, next) => {
   const hostProjection = { _id: 0, firstName: 1, lastName: 1 };
   if (req.query.title) {
     req.query.title = { $regex: req.query.title, $options: 'i' }
+  }
+  if (req.query.skills) {
+    req.query.skills = { $in: [req.query.skills] }
   }
   try {
     const events = await Event.find(req.query).populate({ path: "hostId", select: hostProjection });
