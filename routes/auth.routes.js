@@ -81,7 +81,7 @@ router.post("/forgot-password", async (req, res, next) => {
     });
 
     const mailOptions = {
-      from: "brainbash.jfk@gmail.com",
+      from: process.env.APP_EMAIL,
       to: email,
       subject: "Password Reset",
       html: `<p>You can reset your password <a href="${process.env.CLIENT_URL}/reset-password/${token}">here</a></p>`,
