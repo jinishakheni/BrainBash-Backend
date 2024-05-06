@@ -22,7 +22,7 @@ const eventSchema = new Schema(
       required: [true, "Duration is required."],
     },
     skills: [String],
-    category: String,
+    category: {type: String, required:true},
     mode: {
       type: String,
       enum: ["Online", "Offline"],
