@@ -10,10 +10,21 @@ const User = require("../models/User.model");
 //Routes
 router.get("/", async (req, res, next) => {
   req.query["skills.0"] = { $exists: true };
+  if (req.query.fullName) {
+    req.query.fullName = { $regex: req.query.fullName, $options: 'i' }
+  }
+  if (req.query.categories) {
+    req.query.categories = { $in: [req.query.categories] }
+  }
+  if (req.query.skills) {
+    req.query["skills.name"] = req.query.skills;
+    delete req.query.skills;
+  }
   try {
     const users = await User.find(req.query).select({
       fullName: 1,
       categories: 1,
+      photo: 1,
       _id: 1,
     });
     res.status(200).json(users);
