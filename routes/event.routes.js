@@ -22,15 +22,13 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
 });
 
 // Fetch event by eventId route
 router.get("/:eventId", async (req, res, next) => {
   const { eventId } = req.params;
-
   try {
-    const event = await Event.findById(eventId).populate("hostId");
+    const event = await Event.findById(eventId).populate('hostId', 'fullName photo').populate('attendees', 'fullName photo');
     event ? res.status(200).json(event) : res.status(404).json({ message: "The requested event was not found" });
   } catch (error) {
     next(error);
