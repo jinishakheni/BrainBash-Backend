@@ -15,10 +15,12 @@ withDB(() => {
     console.log(`Server listening on http://localhost:${PORT}`);
   });
 
+  const FRONTEND_URL = process.env.ORIGIN || "http://localhost:5173";
+
   //-----------------SCOKET.IO SETUP-------------------------------
   const io = new Server(myServer, {
     cors: {
-      origin: "*",
+      origin: [FRONTEND_URL],
     },
   });
 
@@ -45,14 +47,15 @@ withDB(() => {
       // As the conversation happens, keep saving the messages in the DB
       MessageModel.create(newMessage).then(async (createdMessage) => {
         try {
-            let populatedMessage = await MessageModel.populate(createdMessage, { path: 'sender' });
-            socket.to(data.chatId).emit("receive_message", populatedMessage);
+          let populatedMessage = await MessageModel.populate(createdMessage, {
+            path: "sender",
+          });
+          socket.to(data.chatId).emit("receive_message", populatedMessage);
         } catch (err) {
-            // Handle error
-            console.error(err);
+          // Handle error
+          console.error(err);
         }
-    });
-    
+      });
     });
   });
 });
