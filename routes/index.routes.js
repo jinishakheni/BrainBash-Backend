@@ -21,4 +21,8 @@ router.use("/categories", categoryRoutes);
 const skillRoutes = require("./skill.routes");
 router.use("/skills", skillRoutes);
 
+//Chat Routes
+const chatRoutes = require('./chat.routes');
+router.use('', chatRoutes);
+
 module.exports = router;
