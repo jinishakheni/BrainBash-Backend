@@ -84,7 +84,7 @@ router.post("/forgot-password", async (req, res, next) => {
       from: process.env.APP_EMAIL,
       to: email,
       subject: "Password Reset",
-      html: `<p>You can reset your password <a href="${process.env.CLIENT_URL}/reset-password/${token}">here</a></p>`,
+      html: `<p>You can reset your password <a href="${process.env.ORIGIN}/reset-password/${token}">here</a></p>`,
     };
 
     const info = await transporter.sendMail(mailOptions);

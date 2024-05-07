@@ -63,7 +63,6 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
         message: "You're not authorized to change another user's data",
       });
     }
-
     const updatedUser = await User.findByIdAndUpdate(id, restOfFields, {
       new: true,
       runValidators: true,
@@ -77,6 +76,68 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
     next(error);
   }
 });
+
+router.put("/skill/:userId", async (req, res, next) => {
+  const { userId } = req.params;
+  const { opration } = req.body;
+  const searchQuery = { _id: userId };
+  let updateData = {};
+  if (opration === "add") {
+    updateData = {
+      $push: {
+        skills: {
+          proficiency: req.body.proficiency,
+          skillName: req.body.skillName,
+        },
+      },
+      $addToSet: { categories: req.body.category }
+    }
+  } else if (opration === "update") {
+    searchQuery['skills.skillName'] = req.body.skillName;
+    if (req.body.proficiency) {
+      updateData = {
+        $set: {
+          'skills.$.proficiency': req.body.proficiency,
+        },
+      }
+    } else if (req.body.ratingScore) {
+      updateData = {
+        $set: {
+          'skills.$.ratingScore': req.body.ratingScore,
+          'skills.$.ratingCount': req.body.ratingCount,
+        },
+      }
+    }
+  } else if (opration === "delete") {
+    updateData = {
+      $pull: {
+        skills: { skillName: req.body.skillName },
+        categories: req.body.category
+      },
+    }
+  }
+  try {
+    // Check new skill is already exist for user or not
+    if (opration === "add") {
+      const user = await User.findById(userId);
+      const existingSkillNames = user.skills.map((skill) => skill.skillName);
+      if (existingSkillNames.indexOf(req.body.skillName) >= 0) {
+        return res.status(404).json({ message: "Skill already added" })
+      }
+    }
+    const updatedUser = await User.findOneAndUpdate(
+      searchQuery,
+      updateData, { new: true }
+    );
+    if (updatedUser) {
+      res.status(200).json(updatedUser);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
+})
 
 router.delete("/:id", isAuthenticated, async (req, res, next) => {
   const { id } = req.params;

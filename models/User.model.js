@@ -52,6 +52,7 @@ const userSchema = new Schema(
       type: String,
       enum: ["Female", "Male"],
     },
+    nationality: String,
     photo: String,
     bio: {
       type: String,
@@ -61,6 +62,7 @@ const userSchema = new Schema(
       {
         skillName: {
           type: String,
+          trim: true,
           required: true,
         },
         proficiency: {
