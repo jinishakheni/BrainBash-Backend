@@ -6,7 +6,11 @@ const ConversationSchema = new Schema({
       ref: 'User',
       type: Schema.Types.ObjectId
     },
-  ] 
+  ],
+  unreadParticipants: [{
+    ref: 'User',
+    type: Schema.Types.ObjectId
+  }]
 })
 
 // 2. Define your model
