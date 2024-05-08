@@ -12,7 +12,11 @@ let MessageSchema = new Schema({
   conversationId : {
     ref: 'Conversation',
     type: Schema.Types.ObjectId
-  } 
+  },
+  unreadParticipants: [{
+    ref: 'User',
+    type: Schema.Types.ObjectId
+  }]
 }, {
   timestamps: true
 })
