@@ -77,7 +77,7 @@ router.put("/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.put("/skill/:userId", async (req, res, next) => {
+router.put("/skill/:userId", isAuthenticated, async (req, res, next) => {
   const { userId } = req.params;
   const { opration } = req.body;
   const searchQuery = { _id: userId };

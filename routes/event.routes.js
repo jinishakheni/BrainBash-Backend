@@ -17,6 +17,9 @@ router.get("/", async (req, res, next) => {
   if (req.query.skills) {
     req.query.skills = { $in: [req.query.skills] };
   }
+  if (req.query.attendees) {
+    req.query.attendees = { $in: [req.query.attendees] };
+  }
   try {
     const events = await Event.find(req.query).populate({
       path: "hostId",
@@ -60,7 +63,7 @@ router.put("/:eventId", async (req, res, next) => {
     const updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, {
       new: true,
       runValidators: true,
-    });
+    }).populate('attendees', 'fullName photo');
     updatedEvent
       ? res.status(200).json(updatedEvent)
       : res.status(404).json({ message: "The requested event was not found" });
