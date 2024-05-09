@@ -17,7 +17,7 @@ router.get("/", async (req, res, next) => {
     req.query.categories = { $in: [req.query.categories] }
   }
   if (req.query.skills) {
-    req.query["skills.name"] = req.query.skills;
+    req.query["skills.skillName"] = req.query.skills;
     delete req.query.skills;
   }
   try {
