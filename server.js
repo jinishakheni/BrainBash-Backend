@@ -26,8 +26,9 @@ withDB(() => {
   });
 
   io.on("connection", (socket) => {
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
+    socket.on("disconnect", (reason) => {
+      // the reason of the disconnection, for example "transport error"
+      console.log("User disconnected reason" + reason);
     });
 
     socket.on("join_chat", (data) => {
@@ -91,9 +92,12 @@ withDB(() => {
           });
 
           participantsExcludedSender.forEach(async (participantId) => {
-            socket.to(participantId.toString()).emit("unread_conversations2",conversationId);
-            socket.to(participantId.toString()).emit("unread_conversations",conversationId);
-
+            io
+              .to(participantId.toString())
+              .emit("unread_conversations2", conversationId);
+              io
+              .to(participantId.toString())
+              .emit("unread_conversations", conversationId);
           });
 
           return participantsExcludedSender;
@@ -107,8 +111,6 @@ withDB(() => {
       };
 
       await getParticipantsExceptAndUpdateUnread(chatId, sender);
-
-      // As the conversation happens, keep saving the messages in the DB
     });
   });
 });
