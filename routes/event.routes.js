@@ -25,6 +25,9 @@ router.get("/", async (req, res, next) => {
       path: "hostId",
       select: hostProjection,
     });
+    events.sort(
+      (a, b) => Date.parse(b.startingTime) - Date.parse(a.startingTime)
+    )
     res.status(200).json(events);
   } catch (error) {
     next(error);
