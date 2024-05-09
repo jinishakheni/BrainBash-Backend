@@ -6,6 +6,7 @@ const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
 
 //Models
 const User = require("../models/User.model");
+const Event = require("../models/Event.model");
 
 //Routes
 router.get("/", async (req, res, next) => {
@@ -123,6 +124,13 @@ router.put("/skill/:userId", isAuthenticated, async (req, res, next) => {
       const existingSkillNames = user.skills.map((skill) => skill.skillName);
       if (existingSkillNames.indexOf(req.body.skillName) >= 0) {
         return res.status(404).json({ message: "Skill already added" })
+      }
+    }
+    if (opration === "delete") {
+      const currentDate = new Date();
+      const events = await Event.find({ hostId: userId, skills: { $in: [req.body.skillName] }, startingTime: { $gte: currentDate } });
+      if (events.length) {
+        return res.status(404).json({ message: "You have upcomming event for your skill" })
       }
     }
     const updatedUser = await User.findOneAndUpdate(
