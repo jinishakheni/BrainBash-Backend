@@ -33,7 +33,7 @@ withDB(() => {
 
     function sendHeartbeat() {
       setTimeout(sendHeartbeat, 5000);
-      io.sockets.emit("ping", { beat: 1 });
+      socket.emit("ping", { beat: 1 });
     }
 
     setTimeout(sendHeartbeat, 5000);
@@ -95,9 +95,7 @@ withDB(() => {
                 }
               );
 
-              io.sockets
-                // .to(conversationId)
-                .emit("receive_message", populatedMessage);
+              io.to(conversationId).emit("receive_message", populatedMessage);
             } catch (err) {
               // Handle error
               console.error(err);
@@ -105,11 +103,11 @@ withDB(() => {
           });
 
           participantsExcludedSender.forEach(async (participantId) => {
-            io.sockets
-              // .to(participantId.toString())
+            socket
+              .to(participantId.toString())
               .emit("unread_conversations2", conversationId);
-            io.sockets
-              // .to(participantId.toString())
+            socket
+              .to(participantId.toString())
               .emit("unread_conversations", conversationId);
           });
 
