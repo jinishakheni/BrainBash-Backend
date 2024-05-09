@@ -26,8 +26,19 @@ withDB(() => {
   });
 
   io.on("connection", (socket) => {
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
+    socket.on("disconnect", (reason, details) => {
+      // the reason of the disconnection, for example "transport error"
+      console.log("User disconnected reason", reason);
+
+      // the low-level reason of the disconnection, for example "xhr post error"
+      console.log("User disconnected details.message", details.message);
+
+      // some additional description, for example the status code of the HTTP response
+      console.log("User disconnected details.description", details.description);
+
+      // some additional context, for example the XMLHttpRequest object
+      console.log("User disconnected details.context", details.context);
+      handleReconnection(socket.id);
     });
 
     socket.on("join_chat", (data) => {
@@ -91,9 +102,12 @@ withDB(() => {
           });
 
           participantsExcludedSender.forEach(async (participantId) => {
-            socket.to(participantId.toString()).emit("unread_conversations2",conversationId);
-            socket.to(participantId.toString()).emit("unread_conversations",conversationId);
-
+            socket
+              .to(participantId.toString())
+              .emit("unread_conversations2", conversationId);
+            socket
+              .to(participantId.toString())
+              .emit("unread_conversations", conversationId);
           });
 
           return participantsExcludedSender;
@@ -110,5 +124,24 @@ withDB(() => {
 
       // As the conversation happens, keep saving the messages in the DB
     });
+    // Logic for handling reconnection
+    const handleReconnection = (socketId) => {
+      const socket = io.sockets.sockets.get(socketId);
+
+      if (socket) {
+        console.log(`Attempting reconnection for socket: ${socketId}`);
+        socket.disconnect();
+        socket.connect();
+      }
+    };
+
+    // Interval for attempting reconnection (example: every 10 seconds)
+    setInterval(() => {
+      io.sockets.sockets.forEach((socket) => {
+        if (!socket.connected) {
+          handleReconnection(socket.id);
+        }
+      });
+    }, 10000); // 10 seconds in milliseconds
   });
 });
