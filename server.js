@@ -103,10 +103,10 @@ withDB(() => {
           });
 
           participantsExcludedSender.forEach(async (participantId) => {
-            socket
+            io
               .to(participantId.toString())
               .emit("unread_conversations2", conversationId);
-            socket
+              io
               .to(participantId.toString())
               .emit("unread_conversations", conversationId);
           });
