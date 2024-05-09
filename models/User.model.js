@@ -53,7 +53,10 @@ const userSchema = new Schema(
       enum: ["Female", "Male"],
     },
     nationality: String,
-    photo: String,
+    photo: {
+      type: String,
+      default: "https://t4.ftcdn.net/jpg/05/33/07/91/360_F_533079136_KQEmUOzLWOlUX7HfvzTp3GheXBjHqNuT.jpg"
+    },
     bio: {
       type: String,
       trim: true,
