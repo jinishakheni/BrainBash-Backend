@@ -42,7 +42,6 @@ withDB(() => {
       console.log("Pong received from client");
     });
 
-
     socket.on("join_chat", (data) => {
       socket.join(data);
       console.log("User Joined Room: " + data);
@@ -96,7 +95,9 @@ withDB(() => {
                 }
               );
 
-              io.to(conversationId).emit("receive_message", populatedMessage);
+              io.sockets
+                .to(conversationId)
+                .emit("receive_message", populatedMessage);
             } catch (err) {
               // Handle error
               console.error(err);
@@ -104,10 +105,10 @@ withDB(() => {
           });
 
           participantsExcludedSender.forEach(async (participantId) => {
-            socket
+            io.sockets
               .to(participantId.toString())
               .emit("unread_conversations2", conversationId);
-            socket
+            io.sockets
               .to(participantId.toString())
               .emit("unread_conversations", conversationId);
           });
