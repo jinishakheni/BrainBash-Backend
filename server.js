@@ -22,10 +22,7 @@ withDB(() => {
   const io = new Server(myServer, {
     cors: {
       origin: [FRONTEND_URL],
-    }, // Configure Socket.io options for reconnection
-    reconnection: true,
-    reconnectionAttempts: 3, // Maximum number of reconnection attempts
-    reconnectionDelay: 1000, // Delay between reconnection attempts (in milliseconds)
+    },
   });
 
   io.on("connection", (socket) => {
@@ -33,6 +30,18 @@ withDB(() => {
       // the reason of the disconnection, for example "transport error"
       console.log("User disconnected reason" + reason);
     });
+
+    function sendHeartbeat() {
+      setTimeout(sendHeartbeat, 5000);
+      io.sockets.emit("ping", { beat: 1 });
+    }
+
+    setTimeout(sendHeartbeat, 5000);
+
+    socket.on("pong", function (data) {
+      console.log("Pong received from client");
+    });
+
 
     socket.on("join_chat", (data) => {
       socket.join(data);
