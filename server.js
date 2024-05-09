@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 5005;
 
 //Import models
 const MessageModel = require("./models/Message.model");
+const Conversation = require("./models/Conversation.model");
 
 // ℹ️ Connects to the database
 withDB(() => {
@@ -34,7 +35,12 @@ withDB(() => {
       console.log("User Joined Room: " + data);
     });
 
-    socket.on("send_message", (data) => {
+    socket.on("join_messages", (userId) => {
+      socket.join(userId);
+      console.log("User Joined his conversations in room: " + userId);
+    });
+
+    socket.on("send_message", async (data) => {
       const {
         content: { sender, message },
         chatId,
@@ -44,18 +50,65 @@ withDB(() => {
         message: message,
         conversationId: chatId,
       };
-      // As the conversation happens, keep saving the messages in the DB
-      MessageModel.create(newMessage).then(async (createdMessage) => {
+
+      const getParticipantsExceptAndUpdateUnread = async (
+        conversationId,
+        excludedParticipantId
+      ) => {
         try {
-          let populatedMessage = await MessageModel.populate(createdMessage, {
-            path: "sender",
+          // Find the conversation by ID and retrieve the participants array
+          const conversation = await Conversation.findById(conversationId);
+
+          if (!conversation) {
+            throw new Error("Conversation not found");
+          }
+
+          // Filter out the excluded participant ID from the participants array
+          const participantsExcludedSender = conversation.participants.filter(
+            (participantId) =>
+              participantId.toString() !== excludedParticipantId.toString()
+          );
+
+          // Update the unreadParticipants array in the Conversation model
+          conversation.unreadParticipants = participantsExcludedSender;
+          newMessage.unreadParticipants = participantsExcludedSender;
+          await conversation.save();
+
+          await MessageModel.create(newMessage).then(async (createdMessage) => {
+            try {
+              let populatedMessage = await MessageModel.populate(
+                createdMessage,
+                {
+                  path: "sender",
+                }
+              );
+
+              io.to(conversationId).emit("receive_message", populatedMessage);
+            } catch (err) {
+              // Handle error
+              console.error(err);
+            }
           });
-          socket.to(data.chatId).emit("receive_message", populatedMessage);
-        } catch (err) {
-          // Handle error
-          console.error(err);
+
+          participantsExcludedSender.forEach(async (participantId) => {
+            socket.to(participantId.toString()).emit("unread_conversations2",conversationId);
+            socket.to(participantId.toString()).emit("unread_conversations",conversationId);
+
+          });
+
+          return participantsExcludedSender;
+        } catch (error) {
+          console.error(
+            "Error retrieving participants and updating unreadParticipants:",
+            error
+          );
+          throw error;
         }
-      });
+      };
+
+      await getParticipantsExceptAndUpdateUnread(chatId, sender);
+
+      // As the conversation happens, keep saving the messages in the DB
     });
   });
 });
