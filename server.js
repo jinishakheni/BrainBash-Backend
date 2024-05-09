@@ -31,17 +31,6 @@ withDB(() => {
       console.log("User disconnected reason" + reason);
     });
 
-    function sendHeartbeat() {
-      setTimeout(sendHeartbeat, 5000);
-      socket.emit("ping", { beat: 1 });
-    }
-
-    setTimeout(sendHeartbeat, 5000);
-
-    socket.on("pong", function (data) {
-      console.log("Pong received from client");
-    });
-
     socket.on("join_chat", (data) => {
       socket.join(data);
       console.log("User Joined Room: " + data);
@@ -122,8 +111,6 @@ withDB(() => {
       };
 
       await getParticipantsExceptAndUpdateUnread(chatId, sender);
-
-      // As the conversation happens, keep saving the messages in the DB
     });
   });
 });
