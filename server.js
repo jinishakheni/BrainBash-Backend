@@ -96,7 +96,7 @@ withDB(() => {
               );
 
               io.sockets
-                .to(conversationId)
+                // .to(conversationId)
                 .emit("receive_message", populatedMessage);
             } catch (err) {
               // Handle error
@@ -106,10 +106,10 @@ withDB(() => {
 
           participantsExcludedSender.forEach(async (participantId) => {
             io.sockets
-              .to(participantId.toString())
+              // .to(participantId.toString())
               .emit("unread_conversations2", conversationId);
             io.sockets
-              .to(participantId.toString())
+              // .to(participantId.toString())
               .emit("unread_conversations", conversationId);
           });
 
