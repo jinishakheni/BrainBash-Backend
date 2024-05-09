@@ -26,18 +26,9 @@ withDB(() => {
   });
 
   io.on("connection", (socket) => {
-    socket.on("disconnect", (reason, details) => {
+    socket.on("disconnect", (reason) => {
       // the reason of the disconnection, for example "transport error"
-      console.log("User disconnected reason", reason);
-
-      // the low-level reason of the disconnection, for example "xhr post error"
-      console.log("User disconnected details.message", details.message);
-
-      // some additional description, for example the status code of the HTTP response
-      console.log("User disconnected details.description", details.description);
-
-      // some additional context, for example the XMLHttpRequest object
-      console.log("User disconnected details.context", details.context);
+      console.log("User disconnected reason"+ reason);
       handleReconnection(socket.id);
     });
 
