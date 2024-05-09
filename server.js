@@ -22,14 +22,16 @@ withDB(() => {
   const io = new Server(myServer, {
     cors: {
       origin: [FRONTEND_URL],
-    },
+    }, // Configure Socket.io options for reconnection
+    reconnection: true,
+    reconnectionAttempts: 3, // Maximum number of reconnection attempts
+    reconnectionDelay: 1000, // Delay between reconnection attempts (in milliseconds)
   });
 
   io.on("connection", (socket) => {
     socket.on("disconnect", (reason) => {
       // the reason of the disconnection, for example "transport error"
-      console.log("User disconnected reason"+ reason);
-      handleReconnection(socket.id);
+      console.log("User disconnected reason" + reason);
     });
 
     socket.on("join_chat", (data) => {
@@ -115,24 +117,5 @@ withDB(() => {
 
       // As the conversation happens, keep saving the messages in the DB
     });
-    // Logic for handling reconnection
-    const handleReconnection = (socketId) => {
-      const socket = io.sockets.sockets.get(socketId);
-
-      if (socket) {
-        console.log(`Attempting reconnection for socket: ${socketId}`);
-        socket.disconnect();
-        socket.connect();
-      }
-    };
-
-    // Interval for attempting reconnection (example: every 10 seconds)
-    setInterval(() => {
-      io.sockets.sockets.forEach((socket) => {
-        if (!socket.connected) {
-          handleReconnection(socket.id);
-        }
-      });
-    }, 10000); // 10 seconds in milliseconds
   });
 });
