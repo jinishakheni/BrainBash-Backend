@@ -1,16 +1,18 @@
 const router = require("express").Router();
 
-const {sendEmailOnContactUs} = require("../services/emailService");
+const { sendEmailOnContactUs } = require("../services/emailService");
 
 router.post("/", async (req, res, next) => {
-  const { senderEmail,senderName, senderMessage } = req.body;
+  const { senderEmail, senderName, senderMessage } = req.body;
 
   try {
-    if (senderName && senderMessage) {
+    if (senderEmail && senderName && senderMessage) {
       await sendEmailOnContactUs(senderEmail, senderName, senderMessage);
       res.sendStatus(200);
     } else {
-      res.status;
+      res
+        .status(400)
+        .send({ error: "Missing senderEmail, senderName, or senderMessage" });
     }
   } catch (error) {
     next(error);
@@ -18,4 +20,3 @@ router.post("/", async (req, res, next) => {
 });
 
 module.exports = router;
-
