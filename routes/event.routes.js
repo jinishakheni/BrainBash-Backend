@@ -6,7 +6,7 @@ const { isAuthenticated } = require("../middlewares/route-gaurd.middleware");
 
 //Model
 const Event = require("../models/Event.model");
-const sendEmailsToAttendeesOnEventDelete = require("../services/emailService");
+const {sendEmailsToAttendeesOnEventDelete} = require("../services/emailService");
 
 // Fetch events route
 router.get("/", async (req, res, next) => {
