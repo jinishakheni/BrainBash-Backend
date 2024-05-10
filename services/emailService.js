@@ -12,10 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmailOnContactUs = async (event) => {
-  const senderName = event.sender.name;
-  const senderMessage = event.sender.message;
-
+const sendEmailOnContactUs = async (senderName, senderMessage) => {
   const emailOptions = {
     from: process.env.APP_EMAIL,
     to: process.env.APP_EMAIL,
@@ -25,10 +22,10 @@ const sendEmailOnContactUs = async (event) => {
   try {
     const info = await transporter.sendMail(emailOptions);
     console.log(
-      `Email sent successfully to ${attendee.email}: ${info.response}`
+      `Email sent successfully to ${process.env.APP_EMAIL}: ${info.response}`
     );
   } catch (error) {
-    console.error(`Error sending email to ${attendee.email}:`, error);
+    console.error(`Error sending email to ${process.env.APP_EMAIL}:`, error);
   }
 };
 
@@ -92,4 +89,7 @@ const sendEmailsToAttendeesOnEventDelete = async (event) => {
   });
 };
 
-module.exports = sendEmailsToAttendeesOnEventDelete;
+module.exports = {
+  sendEmailsToAttendeesOnEventDelete,
+  sendEmailOnContactUs
+};
