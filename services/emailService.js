@@ -12,12 +12,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmailOnContactUs = async (senderEmail,senderName, senderMessage) => {
+const sendEmailOnContactUs = async (
+  senderEmail,
+  senderName,
+  senderMessage,
+  senderSubject
+) => {
   const emailOptions = {
     from: process.env.APP_EMAIL,
     to: process.env.APP_EMAIL,
-    subject: `${senderName} sent a contact request`,
-    text: senderMessage + `\n contact him/her with this email: ${senderEmail}`,
+    subject: senderSubject,
+    text:
+      `${senderName} message is:` +
+      senderMessage +
+      `\n contact him/her with this email: ${senderEmail}`,
   };
   try {
     const info = await transporter.sendMail(emailOptions);
@@ -91,5 +99,5 @@ const sendEmailsToAttendeesOnEventDelete = async (event) => {
 
 module.exports = {
   sendEmailsToAttendeesOnEventDelete,
-  sendEmailOnContactUs
+  sendEmailOnContactUs,
 };
