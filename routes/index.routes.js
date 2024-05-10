@@ -25,4 +25,9 @@ router.use("/skills", skillRoutes);
 const chatRoutes = require('./chat.routes');
 router.use('', chatRoutes);
 
+//Contact Us routes
+const contactUsRoutes = require('./contactUs.routes');
+router.use('/contact',contactUsRoutes);
+
+
 module.exports = router;
