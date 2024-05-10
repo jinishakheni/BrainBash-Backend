@@ -3,11 +3,11 @@ const router = require("express").Router();
 const { sendEmailOnContactUs } = require("../services/emailService");
 
 router.post("/", async (req, res, next) => {
-  const { senderEmail, senderName, senderMessage } = req.body;
+  const { senderEmail, senderName, senderMessage, senderSubject } = req.body;
 
   try {
-    if (senderEmail && senderName && senderMessage) {
-      await sendEmailOnContactUs(senderEmail, senderName, senderMessage);
+    if (senderEmail && senderName && senderMessage && senderSubject) {
+      await sendEmailOnContactUs(senderEmail, senderName, senderMessage,senderSubject);
       res.sendStatus(200);
     } else {
       res
