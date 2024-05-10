@@ -22,6 +22,14 @@ const sendEmailOnContactUs = async (event) => {
     subject: `${senderName} sent a contact request`,
     text: senderMessage,
   };
+  try {
+    const info = await transporter.sendMail(emailOptions);
+    console.log(
+      `Email sent successfully to ${attendee.email}: ${info.response}`
+    );
+  } catch (error) {
+    console.error(`Error sending email to ${attendee.email}:`, error);
+  }
 };
 
 const sendEmailsToAttendeesOnEventDelete = async (event) => {
